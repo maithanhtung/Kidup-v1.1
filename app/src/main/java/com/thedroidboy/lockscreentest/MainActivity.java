@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,6 +17,7 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -226,7 +229,10 @@ public class MainActivity extends Activity implements SensorEventListener {
         Intent intent = getIntent();
         timeLeft = intent.getFloatExtra("timeLeft", 0);
         tv_steps.setText(String.valueOf(steps));
-
+        Intent mIntent = new Intent(MainActivity.this, LockScreenService.class);
+        mIntent.putExtra("steps", steps);
+        MainActivity.this.startService(mIntent);
+        Log.d("VEIKKO", "sending steps " + steps);
         long millis = (long) timeLeft;
 
         String hms = String.format("%02d:%02d:%02d" , TimeUnit.MILLISECONDS.toHours(millis),TimeUnit.MILLISECONDS.toMinutes(millis)-TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)) );
@@ -254,6 +260,9 @@ public class MainActivity extends Activity implements SensorEventListener {
             Toast.makeText(this, "Sensor not found", Toast.LENGTH_SHORT).show();
         }
 
+//        Log.d("VEIKKO2", "onResume: with time noti: " + intent.getBooleanExtra("timenoti" , false));
+
+
     }
 
     @Override
@@ -280,6 +289,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             steps = event.values[0] - lastCount - stepsInSensor;
             tv_steps.setText(String.valueOf(steps));
 
+
             Log.d("event SC",String.valueOf(event.values[0]));
             Log.d("last count SC",String.valueOf(lastCount));
             Log.d("timeLeft SC", String.valueOf(timeLeft));
@@ -294,6 +304,21 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    public void addNotification(){
+        NotificationCompat.Builder builder =  new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("10 mins left")
+                .setContentText("You need to move more or the phone will lock");
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0 , notificationIntent , PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
 
     }
 

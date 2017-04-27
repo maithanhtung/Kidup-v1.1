@@ -187,7 +187,18 @@ public class CountDownService extends Service {
                 Intent mIntent = new Intent(CountDownService.this, MainActivity.class);
                 mIntent.putExtra("timeLeft", millisUntilFinished);
                 CountDownService.this.startService(mIntent);
-                Log.d("VEIKKO2", "Time left" + timeLeft);
+                Log.d("VEIKKO2", "Time left ontick in service" + timeLeft);
+
+//                if (timeLeft <= 100000){
+//                    boolean timenoti = true;
+//                    Intent timenotiIntent = new Intent(CountDownService.this, MainActivity.class);
+//                    mIntent.putExtra("timenoti", timenoti);
+//                    CountDownService.this.startService(timenotiIntent);
+//                    Log.d("VEIKKO2" , "service sending timenoti Intent " + timenotiIntent);
+//
+//                }
+
+
             }
 
             public void onFinish() {

@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
 
 /**
  * Created by t3math00 on 4/5/2017.
@@ -25,8 +27,21 @@ public class LockScreenService extends Service implements View.OnClickListener {
     private WindowManager.LayoutParams layoutParams;
     private WindowManager windowManager;
     static float timeGot = 0;
+    static float steps = 0;
 
+    public int onStartCommand (Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+//
+        if (intent != null) {
+            Log.d("VEIKKO", "Recieving some steps" );
+            steps = intent.getFloatExtra("steps", 0);
 
+            Log.d("VEIKKO2", "Steps in LC onchange " + steps);
+
+        }
+        return START_STICKY;
+
+    }
     @Override
     public IBinder onBind(Intent intent) {
         // Not used
@@ -61,6 +76,9 @@ public class LockScreenService extends Service implements View.OnClickListener {
         View btnUnlock = linearLayout.findViewById(R.id.btn_close);
         btnUnlock.setOnClickListener(this);
         View btnEarnTime = linearLayout.findViewById(R.id.btnFinish);
+
+
+//        tv_steps.setText(String.valueOf(MainActivity.steps), TextView.BufferType.EDITABLE);
 //        btnEarnTime.setOnClickListener(this);
 
         btnEarnTime.setOnClickListener(new View.OnClickListener(){
@@ -68,7 +86,7 @@ public class LockScreenService extends Service implements View.OnClickListener {
             public void onClick(View v){
 
                 Log.d("working", "earn");
-                Log.d("steps LSbtn",String.valueOf(MainActivity.steps));
+                Log.d("steps LSbtn",String.valueOf(steps));
                 timeGot = MainActivity.steps *  10000;
                 Intent mIntent = new Intent(LockScreenService.this, CountDownService.class);
                 mIntent.putExtra("timeGot", timeGot);
@@ -114,6 +132,7 @@ public class LockScreenService extends Service implements View.OnClickListener {
             }
         }
     };
+
 
 
 }
